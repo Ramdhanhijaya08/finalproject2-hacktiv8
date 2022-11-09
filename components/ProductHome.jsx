@@ -1,16 +1,10 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import useIsSSR from '../hooks/useIsSSR';
 import { ProductCard } from './card';
 
 const ProductHome = () => {
 	const { products } = useSelector(state => state.product);
-	const [isSSR, setIsSSR] = useState(true);
-
-	useEffect(() => {
-		setIsSSR(false);
-	}, []);
+	const isSSR = useIsSSR();
 
 	return (
 		!isSSR && (
