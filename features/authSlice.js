@@ -51,7 +51,7 @@ const authSlice = createSlice ({
             state.error = action.error.massage;
 		},
     },
-});
+ });
 
 
 export const {addToken,addUser,logout} = authSlice.actions;

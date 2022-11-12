@@ -18,7 +18,7 @@ const Header = () => {
 						<Link href="/cart">Cart</Link>
 					</li>
 				</ul>
-				<Link href="/login" className="rounded-md bg-black px-3 py-1 text-sm text-white transition duration-300 hover:opacity-70">
+				<Link href="/login"  className="rounded-md bg-black px-3 py-1 text-sm text-white transition duration-300 hover:opacity-70">
 					Login
 				</Link>
 			</nav>

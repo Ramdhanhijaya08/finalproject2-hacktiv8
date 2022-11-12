@@ -52,7 +52,7 @@ const LoginPage = () => {
 		<br/>
 		<p className="font-light">Hey There!! Sign in and get the best </p> 
 		<p className="font-light"> your style fashion </p>
-		</div>
+		</div> 
 		<br/>
 
 		{/* input */}
