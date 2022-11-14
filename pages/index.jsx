@@ -12,7 +12,7 @@ const HomePage = () => {
 	return (
 		<MainLayout title="Home">
 			<section>
-				<Image src={hero} alt="Hero" className="rounded-md" priority={true} />
+				<Image src={hero} alt="Hero" className="rounded-md" loading="lazy" />
 			</section>
 
 			<section className="mt-10">
