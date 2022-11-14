@@ -7,7 +7,7 @@ function MyApp({ Component, pageProps }) {
 	return (
 		<Provider store={store}>
 			<Component {...pageProps} />
-			<Toaster />
+			<Toaster position="top-right" />
 		</Provider>
 	);
 }
