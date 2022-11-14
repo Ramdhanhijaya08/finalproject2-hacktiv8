@@ -94,7 +94,7 @@ const DashboardPage = () => {
 						min={0}
 						value={updateQuantity}
 						onChange={e => setUpdateQuantity(e.target.value)}
-						className="h-9 w-20 rounded-md border border-black text-center outline-none"
+						className="h-9 w-16 rounded-md border border-black text-center outline-none"
 					/>
 					<PrimaryButton onClick={() => updateStock !== 0 && setUpdateQuantity(prev => prev - 1)}>-</PrimaryButton>
 				</div>
