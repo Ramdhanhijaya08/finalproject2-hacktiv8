@@ -10,7 +10,7 @@ const MainLayout = ({ title, children }) => {
 				<title>{title ? `${title} | yommerce` : 'yommerce'}</title>
 			</Head>
 			<Header />
-			<main className="layout pt-20">{children}</main>
+			<main className="layout py-20">{children}</main>
 			<Footer />
 		</>
 	);
