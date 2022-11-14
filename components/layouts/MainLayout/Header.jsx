@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import useUser from '../../../hooks/useUser';
 import useIsSSR from '../../../hooks/useIsSSR.js';
 import { Menu, Transition } from '@headlessui/react';
 import { PrimaryButton } from '../../button';
