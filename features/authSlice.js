@@ -3,11 +3,11 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../utils/env';
+import { API_SITE, JWT_SECRET } from '../utils/env';
 
 export const loginUserAPI = createAsyncThunk('auth/loginUser', async ({ email, password }, { rejectWithValue }) => {
 	try {
-		const res = await axios.post('http://localhost:3000/api/login', {
+		const res = await axios.post(`${API_SITE}/login`, {
 			email,
 			password,
 		});
