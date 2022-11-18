@@ -3,14 +3,17 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 
 let salesRecap = [];
+let products = [];
 
-if (typeof window !== 'undefined') salesRecap = JSON.parse(localStorage.getItem('sales-recap')) ?? [];
+if (typeof window !== 'undefined') {
+	salesRecap = JSON.parse(localStorage.getItem('sales-recap')) ?? [];
+	products = JSON.parse(localStorage.getItem('products')) ?? [];
+}
 
 const initialState = {
-	products: [],
+	products,
 	cart: [],
 	salesRecap,
-	ygBedaSamaCart: [],
 	loading: false,
 	error: '',
 };
@@ -29,8 +32,11 @@ export const productSlice = createSlice({
 	name: 'product',
 	initialState,
 	reducers: {
+		setInitialCart: (state, { payload }) => {
+			state.cart = payload;
+		},
 		updateStock: (state, action) => {
-			state.products = state.products.map(product => {
+			const updateProduct = state.products.map(product => {
 				if (product.id === action.payload.id) {
 					return {
 						...product,
@@ -40,14 +46,21 @@ export const productSlice = createSlice({
 					return product;
 				}
 			});
+
+			state.products = updateProduct;
+			localStorage.setItem('products', JSON.stringify(updateProduct));
 		},
 		addToCart: (state, { payload }) => {
-			const findCartItem = state.cart.find(product => product.id === payload.id);
+			const cartLocal = JSON.parse(localStorage.getItem(`cart_${payload.idUser}`)) ?? [];
+			const findCartItem = cartLocal.find(product => product.id === payload.id);
 			const findProduct = state.products.find(product => product.id === payload.id);
 
 			if (findProduct) {
 				if (!findCartItem) {
-					state.cart = [{ ...findProduct, quantity: payload.quantity }, ...state.cart];
+					const addedCart = [{ ...findProduct, quantity: payload.quantity }, ...state.cart];
+					state.cart = addedCart;
+
+					localStorage.setItem(`cart_${payload.idUser}`, JSON.stringify(addedCart));
 					toast.success('Successfully added to cart');
 				} else {
 					toast.error('This item is already in the cart');
@@ -55,16 +68,27 @@ export const productSlice = createSlice({
 			}
 		},
 		updateStockCart: (state, { payload }) => {
-			const findCartItem = state.cart.find(product => product.id === payload.id);
+			const cartLocal = JSON.parse(localStorage.getItem(`cart_${payload.idUser}`)) ?? [];
+			const findCartItem = cartLocal.find(product => product.id === payload.id);
 			const findProduct = state.products.find(product => product.id === payload.id);
 
 			if (findCartItem) {
 				switch (payload.type) {
 					case 'add':
-						if (findCartItem.quantity < findProduct.quantity) findCartItem.quantity += 1;
+						if (findCartItem.quantity < findProduct.quantity) {
+							const updateStock = cartLocal.map(item => (item.id === payload.id ? { ...item, quantity: item.quantity + 1 } : item));
+
+							state.cart = updateStock;
+							localStorage.setItem(`cart_${payload.idUser}`, JSON.stringify(updateStock));
+						}
 						break;
 					case 'reduce':
-						if (findCartItem.quantity !== 1) findCartItem.quantity -= 1;
+						if (findCartItem.quantity !== 1) {
+							const updateStock = cartLocal.map(item => (item.id === payload.id ? { ...item, quantity: item.quantity - 1 } : item));
+
+							state.cart = updateStock;
+							localStorage.setItem(`cart_${payload.idUser}`, JSON.stringify(updateStock));
+						}
 						break;
 					default:
 						console.debug('type not found');
@@ -73,13 +97,17 @@ export const productSlice = createSlice({
 			}
 		},
 		removeCartItem: (state, { payload }) => {
-			const filterCart = state.cart.filter(product => product.id !== payload);
+			const cartLocal = JSON.parse(localStorage.getItem(`cart_${payload.idUser}`)) ?? [];
+			const filterCart = cartLocal.filter(product => product.id !== payload.id);
+
 			state.cart = filterCart;
+			localStorage.setItem(`cart_${payload.idUser}`, JSON.stringify(filterCart));
 		},
 		checkout: (state, { payload }) => {
+			const cartLocal = JSON.parse(localStorage.getItem(`cart_${payload.idUser}`)) ?? [];
 			// reduce quantity in product
-			state.products = state.products.map(product => {
-				const findCartItem = state.cart.find(item => item.id === product.id);
+			const updateProduct = state.products.map(product => {
+				const findCartItem = cartLocal.find(item => item.id === product.id);
 				if (findCartItem) {
 					return {
 						...product,
@@ -90,9 +118,12 @@ export const productSlice = createSlice({
 				return product;
 			});
 
+			state.products = updateProduct;
+			localStorage.setItem('products', JSON.stringify(updateProduct));
+
 			const sales = state.salesRecap.map(product => {
 				// check product in sales recap same with product in cart or not
-				const sameWithRecap = state.cart.find(item => item.id === product.id);
+				const sameWithRecap = cartLocal.find(item => item.id === product.id);
 				if (sameWithRecap) {
 					return {
 						...product,
@@ -104,7 +135,7 @@ export const productSlice = createSlice({
 
 			// check remaining cart products
 			const remainingCart = [];
-			state.cart.forEach(item => {
+			cartLocal.forEach(item => {
 				const same = sales.find(s => s.id === item.id);
 				if (!same) remainingCart.push(item);
 			});
@@ -113,6 +144,7 @@ export const productSlice = createSlice({
 			localStorage.setItem('sales-recap', JSON.stringify([...remainingCart, ...sales]));
 
 			state.cart = [];
+			localStorage.setItem(`cart_${payload.idUser}`, JSON.stringify([]));
 
 			toast.success('We have received the order');
 			toast.success('Thank you for ordering');
@@ -125,6 +157,8 @@ export const productSlice = createSlice({
 		[getProducts.fulfilled]: (state, { payload }) => {
 			state.loading = false;
 			state.products = payload;
+			localStorage.setItem('products', JSON.stringify(payload));
+
 			state.error = '';
 		},
 		[getProducts.rejected]: (state, action) => {
@@ -136,5 +170,5 @@ export const productSlice = createSlice({
 	},
 });
 
-export const { updateStock, addToCart, updateStockCart, removeCartItem, checkout } = productSlice.actions;
+export const { updateStock, addToCart, updateStockCart, removeCartItem, checkout, setInitialCart } = productSlice.actions;
 export default productSlice.reducer;

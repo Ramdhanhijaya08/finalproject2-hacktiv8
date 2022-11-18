@@ -7,18 +7,27 @@ import { BsCartPlusFill as CartIcon } from 'react-icons/bs';
 import axios from 'axios';
 import useIsSSR from '../../hooks/useIsSSR';
 import { addToCart } from '../../features/productSlice';
+import { useRouter } from 'next/router';
 
 const ProductDetailPage = ({ product, id }) => {
 	const [quantity, setQuantity] = useState(1);
 	const isSSR = useIsSSR();
 	const dispatch = useDispatch();
+	const router = useRouter();
 
 	const productStore = useSelector(state => state.product.products.find(p => p.id === Number(id)));
+	const user = useSelector(state => state.user.user);
 
 	const addToCartHandler = () => {
+		if (!user) {
+			router.push('/login');
+			return;
+		}
+
 		if (quantity <= productStore.quantity && quantity > 0) {
 			dispatch(
 				addToCart({
+					idUser: user.id,
 					id: Number(id),
 					quantity: Number(quantity),
 				})
@@ -48,16 +57,29 @@ const ProductDetailPage = ({ product, id }) => {
 								Stock Total : <span className="font-semibold">{productStore?.quantity}</span>
 							</p>
 							<div className="mt-4 flex items-center space-x-2">
-								<PrimaryButton onClick={() => quantity < productStore?.quantity && setQuantity(prev => Number(prev) + 1)}>+</PrimaryButton>
+								<PrimaryButton
+									onClick={() => quantity < productStore?.quantity && setQuantity(prev => Number(prev) + 1)}
+									disabled={Number(productStore?.quantity) === 0}
+									className="disabled:cursor-not-allowed disabled:bg-slate-400"
+								>
+									+
+								</PrimaryButton>
 								<input
 									type="number"
 									min={1}
+									disabled={Number(productStore?.quantity) === 0}
 									value={quantity}
 									max={productStore?.quantity}
 									onChange={e => setQuantity(e.target.value)}
 									className="h-9 w-16 rounded-md border border-black text-center outline-none"
 								/>
-								<PrimaryButton onClick={() => quantity !== 1 && setQuantity(prev => prev - 1)}>-</PrimaryButton>
+								<PrimaryButton
+									onClick={() => quantity !== 1 && setQuantity(prev => prev - 1)}
+									disabled={Number(productStore?.quantity) === 0}
+									className="disabled:cursor-not-allowed disabled:bg-slate-400"
+								>
+									-
+								</PrimaryButton>
 							</div>
 
 							<PrimaryButton

@@ -15,4 +15,6 @@ export const store = configureStore({
 		}),
 });
 
-store.dispatch(getProducts());
+if (typeof window !== 'undefined') {
+	if (!localStorage.getItem('products')) store.dispatch(getProducts());
+}

@@ -64,7 +64,7 @@ export const getServerSideProps = ctx => {
 	} catch {
 		return {
 			redirect: {
-				destination: '/admin-login',
+				destination: '/',
 				permanent: false,
 			},
 		};
